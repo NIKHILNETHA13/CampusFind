@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFind — Notifications</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">Campus<span>Find</span></a>
+      <button class="menu-toggle" type="button">Menu</button>
+      <nav class="nav"></nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
+      <div>
+        <h1 style="margin-bottom: 4px;">Notifications</h1>
+        <p class="meta" style="margin: 0;">Updates on your reported items and submitted interests.</p>
+      </div>
+      <div>
+        <button class="btn btn-light btn-sm" id="mark-all-read-btn" type="button">Mark all as read</button>
+      </div>
+    </div>
+
+    <div id="notifications-error" class="error-box" style="display: none;"></div>
+
+    <div class="panel">
+      <div id="notifications-list" class="notif-list">
+        <p class="meta">Loading notifications...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">CampusFind · Campus Lost & Found</div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>

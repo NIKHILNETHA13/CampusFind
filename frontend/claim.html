@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFind — I Think This Is Mine</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">Campus<span>Find</span></a>
+      <button class="menu-toggle" type="button">Menu</button>
+      <nav class="nav"></nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 28px;">
+    <p><a href="items.html">← Back to items</a></p>
+    <h1>I Think This Is Mine</h1>
+    <div id="item-summary" style="margin-bottom: 24px;"></div>
+    <div class="form-card">
+      <form id="claim-form" novalidate>
+        <p style="color: var(--navy); margin-bottom: 16px;">Tell the person who reported this item why you think it may be yours. All fields are optional.</p>
+        <div class="form-group">
+          <label for="message">Message (optional)</label>
+          <textarea id="message" rows="4" placeholder="I think this may be my item. I lost it yesterday."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="additional_info">Additional information (optional)</label>
+          <textarea id="additional_info" rows="2" placeholder="Any distinguishing marks or identifiers"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="handover_note">Availability / Handover note (optional)</label>
+          <textarea id="handover_note" rows="2" placeholder="I will be near the campus library after 4 PM."></textarea>
+        </div>
+        <p class="error" id="claim-error"></p>
+        <button class="btn btn-gold" type="submit">Submit Response</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">CampusFind · Campus Lost & Found</div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>

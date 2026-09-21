@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFind — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">Campus<span>Find</span></a>
+      <button class="menu-toggle" type="button">Menu</button>
+      <nav class="nav"></nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 28px;">
+    <div class="panel" style="margin-bottom: 24px;">
+      <h2>Welcome, <span id="user-name">User</span></h2>
+      <p class="meta">Email: <span id="user-email">—</span> | Role: <span id="user-role">—</span></p>
+    </div>
+
+    <h1>My Activity</h1>
+    <p class="meta">Your reports and interests.</p>
+
+    <div id="dashboard-error" class="error-box" style="display: none;"></div>
+
+    <section class="stats" id="dashboard-stats">
+      <article class="stat-card">
+        <h3 id="stat-my-reports">0</h3>
+        <p>My reports</p>
+      </article>
+      <article class="stat-card">
+        <h3 id="stat-active-reports">0</h3>
+        <p>Active reports</p>
+      </article>
+      <article class="stat-card">
+        <h3 id="stat-returned-reports">0</h3>
+        <p>Returned reports</p>
+      </article>
+      <article class="stat-card">
+        <h3 id="stat-my-interests">0</h3>
+        <p>My interests</p>
+      </article>
+      <article class="stat-card">
+        <h3 id="stat-unread-notifs">0</h3>
+        <p>Unread notifications</p>
+      </article>
+    </section>
+
+    <div class="panel">
+      <h2>My Reports</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Category & Location</th>
+            <th>Status</th>
+            <th>Interests</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="my-reports-table">
+          <tr><td colspan="6">Loading reports...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+      <h2>My Interests</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Reporter Contact</th>
+            <th>Submitted Date</th>
+            <th>Availability / Note</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="my-interests-table">
+          <tr><td colspan="7">Loading interests...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">CampusFind · Campus Lost & Found</div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFind — Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">Campus<span>Find</span></a>
+      <button class="menu-toggle" type="button">Menu</button>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="items.html">Browse Items</a>
+        <a href="report.html">Report Item</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a class="active" href="admin.html">Admin</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 28px;">
+    <h1>Admin dashboard</h1>
+    <p class="meta">Inspect users, items, and interests.</p>
+
+    <section class="stats" id="admin-stats">
+      <article class="stat-card">
+        <h3>0</h3>
+        <p>Total users</p>
+      </article>
+      <article class="stat-card">
+        <h3>0</h3>
+        <p>Total items</p>
+      </article>
+      <article class="stat-card">
+        <h3>0</h3>
+        <p>Active items</p>
+      </article>
+      <article class="stat-card">
+        <h3>0</h3>
+        <p>Total interests</p>
+      </article>
+    </section>
+
+    <div class="panel">
+      <h2>All users</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody id="admin-users-table">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+      <h2>All items</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Reporter</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="admin-items-table">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+      <h2>All interests</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Interested Student</th>
+            <th>Email</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="admin-interests-table">
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">CampusFind · Campus Lost & Found</div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>

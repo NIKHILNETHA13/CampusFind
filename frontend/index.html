@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFind — Home</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">Campus<span>Find</span></a>
+      <button class="menu-toggle" type="button">Menu</button>
+      <nav class="nav">
+        <a class="active" href="index.html">Home</a>
+        <a href="items.html">Browse Items</a>
+        <a href="report.html">Report Item</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="admin.html">Admin</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Find what you lost. Return what you found.</h1>
+      <p>CampusFind helps students report lost and found items across campus and get them back quickly.</p>
+      <form class="search-row" id="home-search">
+        <input id="home-search-input" type="search" placeholder="Search wallets, IDs, bottles...">
+        <button class="btn btn-gold" type="submit">Search</button>
+      </form>
+      <div class="actions">
+        <a class="btn btn-gold" href="report.html?type=LOST">Report Lost Item</a>
+        <a class="btn btn-outline" href="report.html?type=FOUND">Report Found Item</a>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="stats">
+      <article class="stat-card">
+        <h3 id="stat-lost">0</h3>
+        <p>Lost Items</p>
+      </article>
+      <article class="stat-card">
+        <h3 id="stat-found">0</h3>
+        <p>Found Items</p>
+      </article>
+      <article class="stat-card">
+        <h3 id="stat-returned">0</h3>
+        <p>Items Returned</p>
+      </article>
+    </section>
+
+    <h2 class="section-title">Recent items</h2>
+    <div class="item-grid" id="recent-items"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">CampusFind · Campus Lost & Found</div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>
