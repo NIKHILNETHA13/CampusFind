@@ -94,7 +94,7 @@ docker compose up -d --build
 | `DB_USER` / `DB_PASSWORD` / `DB_NAME` | PostgreSQL credentials (Docker) | `campususer` / `campuspass` / `campusfind` |
 | `DATABASE_URL` | Full Postgres connection string for Docker | auto from above |
 | `UPLOAD_DIR` | Upload path inside container | `/app/backend/uploads` |
-| `ADMIN_INVITE_CODE` | Code to register as admin | `campusfind-admin-2024` |
+| `ADMIN_INVITE_CODE` | Code to register as admin | `<set-a-private-admin-invite-code>` |
 
 ### Persistence
 
@@ -139,7 +139,7 @@ docker compose up -d --build
 
 ## Admin Access
 
-First registered user with `ADMIN_INVITE_CODE` becomes admin. Default code: `campusfind-admin-2024`.
+Register with `ADMIN_INVITE_CODE` (set in `.env`) to create an admin account. Default: `<set-a-private-admin-invite-code>`.
 
 ## License
 
