@@ -3,7 +3,8 @@ import sys
 import uuid
 from pathlib import Path
 from typing import List, Optional
-
+from fastapi.responses import Response
+from azure.storage.blob import BlobServiceClient
 # Ensure backend directory is prioritized in sys.path over any external PYTHONPATH entries
 BACKEND_DIR = Path(__file__).resolve().parent
 if str(BACKEND_DIR) not in sys.path:
@@ -42,9 +43,41 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 
 # Serve uploaded files statically
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+#app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+AZURE_STORAGE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+AZURE_STORAGE_ACCOUNT_KEY = os.getenv("AZURE_STORAGE_ACCOUNT_KEY")
+AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "item-images")
 
+blob_service_client = BlobServiceClient(
+    account_url=f"https://{AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net",
+    credential=AZURE_STORAGE_ACCOUNT_KEY,
+)
 
+blob_container_client = blob_service_client.get_container_client(
+    AZURE_STORAGE_CONTAINER
+)
+@app.get("/uploads/{filename}")
+async def get_uploaded_image(filename: str):
+    try:
+        blob_client = blob_container_client.get_blob_client(filename)
+        blob_data = blob_client.download_blob().readall()
+
+        properties = blob_client.get_blob_properties()
+        content_type = (
+            properties.content_settings.content_type
+            or "application/octet-stream"
+        )
+
+        return Response(
+            content=blob_data,
+            media_type=content_type
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=404,
+            detail="Image not found"
+        )
 # --- Models ---
 
 class UserRegister(BaseModel):
