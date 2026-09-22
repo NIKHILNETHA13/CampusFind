@@ -47,9 +47,9 @@ services:
       dockerfile: Dockerfile.frontend
     ports:
       - "80:80"
-    depends_on:
-      - api
-
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
   adminer:
     image: adminer
     restart: unless-stopped
