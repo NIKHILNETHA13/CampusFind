@@ -191,7 +191,7 @@ function buildNav() {
       { href: "index.html", label: "Home", show: true },
       { href: "items.html", label: "Browse Items", show: true },
       { href: "report.html", label: "Report Item", show: true },
-      { href: "index.html#how-it-works", label: "How It Works", show: true },
+      { href: "how-it-works.html", label: "How It Works", show: true },
       { href: "login.html", label: "Login", show: true },
       { href: "register.html", label: "Register", show: true },
     ];
@@ -212,7 +212,7 @@ function buildNav() {
       { href: "items.html", label: "Browse Items", show: true },
       { href: "report.html", label: "Report Item", show: true },
       { href: "dashboard.html", label: "My Activity", show: true },
-      { href: "index.html#how-it-works", label: "How It Works", show: true },
+      { href: "how-it-works.html", label: "How It Works", show: true },
       { href: "notifications.html", label: 'Notifications <span id="nav-notif-count" class="nav-badge" style="display:none;"></span>', show: true, raw: true },
       { href: "#", label: "Logout", show: true, logout: true },
     ];
