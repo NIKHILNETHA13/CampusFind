@@ -28,10 +28,11 @@ except ImportError:
 
 app = FastAPI(title="CampusFind API", version="0.5.0")
 
-# Allow frontend (file:// or localhost) to call the API
+# Restrict CORS to production frontend origin
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "https://campusfind.centralindia.cloudapp.azure.com")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[FRONTEND_ORIGIN],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

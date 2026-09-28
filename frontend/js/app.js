@@ -388,15 +388,15 @@ async function setupDetails() {
     const interestCount = Number(item.interest_count || 0);
 
     const imageHtml = item.image_url
-      ? `<img src="${API_BASE}${item.image_url}" alt="${item.title}" style="width: 100%; height: 280px; object-fit: cover; border-radius: 10px;" onerror="this.style.display='none'; this.parentElement.querySelector('.item-photo-fallback')?.style.display='flex';">
-         <div class="item-photo-fallback" style="height: 280px; display: none; align-items: center; justify-content: center; background: var(--bg); border-radius: 10px; font-size: 3rem;">${item.emoji || "📦"}</div>`
-      : `<div class="item-photo" style="height: 280px; display: flex; align-items: center; justify-content: center; background: var(--bg); border-radius: 10px; font-size: 3rem;">${item.emoji || "📦"}</div>`;
+      ? `<img src="${API_BASE}${item.image_url}" alt="${escapeHtml(item.title)}" style="width: 100%; height: 280px; object-fit: cover; border-radius: 10px;" onerror="this.style.display='none'; this.parentElement.querySelector('.item-photo-fallback')?.style.display='flex';">
+         <div class="item-photo-fallback" style="height: 280px; display: none; align-items: center; justify-content: center; background: var(--bg); border-radius: 10px; font-size: 3rem;">${escapeHtml(item.emoji || "📦")}</div>`
+      : `<div class="item-photo" style="height: 280px; display: flex; align-items: center; justify-content: center; background: var(--bg); border-radius: 10px; font-size: 3rem;">${escapeHtml(item.emoji || "📦")}</div>`;
 
     const handoverHtml = (item.handover_method || item.handover_note) ? `
       <div class="handover-info" style="margin-top: 14px; padding: 12px; background: var(--bg); border-radius: 8px;">
         <h4 style="margin-top: 0; margin-bottom: 6px;">Handover Information</h4>
-        ${item.handover_method ? `<p style="margin: 4px 0;"><strong>Method:</strong> ${item.handover_method.replace('_', ' ')}</p>` : ''}
-        ${item.handover_note ? `<p style="margin: 4px 0;"><strong>Note:</strong> ${item.handover_note}</p>` : ''}
+        ${item.handover_method ? `<p style="margin: 4px 0;"><strong>Method:</strong> ${escapeHtml(item.handover_method.replace('_', ' '))}</p>` : ''}
+        ${item.handover_note ? `<p style="margin: 4px 0;"><strong>Note:</strong> ${escapeHtml(item.handover_note)}</p>` : ''}
       </div>
     ` : '';
 
@@ -417,14 +417,14 @@ async function setupDetails() {
             <div class="claim-item" style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: var(--surface, #fff);">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                  <strong>${claim.claimant_name}</strong>
-                  <br><small style="color: var(--navy);">Email: <strong>${claim.claimant_email}</strong></small>
+                  <strong>${escapeHtml(claim.claimant_name)}</strong>
+                  <br><small style="color: var(--navy);">Email: <strong>${escapeHtml(claim.claimant_email)}</strong></small>
                 </div>
                 <span class="meta">${claim.created_at ? new Date(claim.created_at).toLocaleDateString() : ""}</span>
               </div>
-              ${claim.message ? `<p style="margin-top: 8px;"><strong>Message:</strong> ${claim.message}</p>` : ''}
-              ${claim.additional_info ? `<p class="meta" style="margin-top: 4px;"><strong>Additional Details:</strong> ${claim.additional_info}</p>` : ''}
-              ${claim.handover_note ? `<p class="meta" style="margin-top: 4px;"><strong>Availability:</strong> ${claim.handover_note}</p>` : ''}
+              ${claim.message ? `<p style="margin-top: 8px;"><strong>Message:</strong> ${escapeHtml(claim.message)}</p>` : ''}
+              ${claim.additional_info ? `<p class="meta" style="margin-top: 4px;"><strong>Additional Details:</strong> ${escapeHtml(claim.additional_info)}</p>` : ''}
+              ${claim.handover_note ? `<p class="meta" style="margin-top: 4px;"><strong>Availability:</strong> ${escapeHtml(claim.handover_note)}</p>` : ''}
             </div>
           `).join("");
         }
@@ -464,10 +464,10 @@ async function setupDetails() {
             <div class="interested-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
               <h3 style="color: var(--found);">✓ You have expressed interest in this item</h3>
               <div class="claim-item" style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: #fafbfc;">
-                <p class="meta" style="margin-top: 0;"><strong>Reporter:</strong> ${myClaim.reporter_name} (${myClaim.reporter_email})</p>
-                <p style="margin: 6px 0;"><strong>Your Message:</strong> ${myClaim.message || '<em>None</em>'}</p>
-                ${myClaim.additional_info ? `<p class="meta" style="margin: 4px 0;"><strong>Additional Info:</strong> ${myClaim.additional_info}</p>` : ''}
-                ${myClaim.handover_note ? `<p class="meta" style="margin: 4px 0;"><strong>Availability / Handover Note:</strong> ${myClaim.handover_note}</p>` : ''}
+                <p class="meta" style="margin-top: 0;"><strong>Reporter:</strong> ${escapeHtml(myClaim.reporter_name)} (${escapeHtml(myClaim.reporter_email)})</p>
+                <p style="margin: 6px 0;"><strong>Your Message:</strong> ${escapeHtml(myClaim.message || 'None')}</p>
+                ${myClaim.additional_info ? `<p class="meta" style="margin: 4px 0;"><strong>Additional Info:</strong> ${escapeHtml(myClaim.additional_info)}</p>` : ''}
+                ${myClaim.handover_note ? `<p class="meta" style="margin: 4px 0;"><strong>Availability / Handover Note:</strong> ${escapeHtml(myClaim.handover_note)}</p>` : ''}
                 <p class="meta" style="margin-bottom: 0;"><small>Submitted: ${myClaim.created_at ? new Date(myClaim.created_at).toLocaleDateString() : ""}</small></p>
               </div>
             </div>
@@ -509,15 +509,15 @@ async function setupDetails() {
       ${imageHtml}
       <div class="panel">
         <div>
-          <span class="badge badge-${item.type.toLowerCase()}">${item.type}</span>
-          <span class="badge badge-${item.status.toLowerCase()}">${formatStatus(item.status)}</span>
+          <span class="badge badge-${escapeHtml(item.type.toLowerCase())}">${escapeHtml(item.type)}</span>
+          <span class="badge badge-${escapeHtml(item.status.toLowerCase())}">${escapeHtml(formatStatus(item.status))}</span>
         </div>
-        <h1 style="margin: 12px 0 6px;">${item.title}</h1>
-        <p>${item.description}</p>
-        <p class="meta"><strong>Category:</strong> ${item.category}</p>
-        <p class="meta"><strong>Location:</strong> ${item.location}</p>
-        <p class="meta"><strong>Date:</strong> ${item.date}</p>
-        <p class="meta"><strong>Status:</strong> ${formatStatus(item.status)}</p>
+        <h1 style="margin: 12px 0 6px;">${escapeHtml(item.title)}</h1>
+        <p>${escapeHtml(item.description)}</p>
+        <p class="meta"><strong>Category:</strong> ${escapeHtml(item.category)}</p>
+        <p class="meta"><strong>Location:</strong> ${escapeHtml(item.location)}</p>
+        <p class="meta"><strong>Date:</strong> ${escapeHtml(item.date)}</p>
+        <p class="meta"><strong>Status:</strong> ${escapeHtml(formatStatus(item.status))}</p>
         <p class="meta"><strong>Interested:</strong> ${interestCount} ${interestCount === 1 ? "student" : "students"}</p>
         ${handoverHtml}
         ${interestSectionHtml}

@@ -45,12 +45,17 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     except (jwt.PyJWTError, TypeError, ValueError):
         raise error
     user = run_query(
-        "SELECT id, name, email, role FROM users WHERE id = %s",
+        "SELECT id, name, email, role, status FROM users WHERE id = %s",
         (user_id,),
         fetch="one",
     )
     if user is None:
         raise error
+    if user.get("status") == "BLOCKED":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is blocked",
+        )
     return user
 
 

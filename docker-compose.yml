@@ -8,14 +8,14 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-campusfind}
-      POSTGRES_USER: ${DB_USER:-campususer}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-campuspass}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-campususer} -d ${DB_NAME:-campusfind}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -23,15 +23,14 @@ services:
   api:
     build: .
     restart: unless-stopped
-    ports:
-      - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-campususer}:${DB_PASSWORD:-campuspass}@db:5432/${DB_NAME:-campusfind}
-      SECRET_KEY: ${SECRET_KEY:-changeme_in_production}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      SECRET_KEY: ${SECRET_KEY}
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       UPLOAD_DIR: /app/backend/uploads
-      ADMIN_INVITE_CODE: ${ADMIN_INVITE_CODE:-campusfind-admin-2024}
+      ADMIN_INVITE_CODE: ${ADMIN_INVITE_CODE}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-https://campusfind.centralindia.cloudapp.azure.com}
     volumes:
       - uploads_data:/app/backend/uploads
     depends_on:
@@ -43,14 +42,15 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "3000:80"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - api
 
   adminer:
     image: adminer
     restart: unless-stopped
-    ports:
-      - "8080:8080"
     depends_on:
       - db
