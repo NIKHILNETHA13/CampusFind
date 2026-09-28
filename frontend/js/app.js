@@ -478,9 +478,10 @@ async function setupDetails() {
           if (isReturned) {
             actionButtonsHtml = '<p class="meta" style="margin-top: 16px; font-weight: 600;">This item has been returned and cannot receive new interest.</p>';
           } else {
+            const claimButtonText = item.type === 'LOST' ? 'I Found It' : "I Think It's Mine";
             actionButtonsHtml = `
               <div style="margin-top: 16px;">
-                <button class="btn btn-gold" id="claim-btn" type="button">I Think This Is Mine</button>
+                <button class="btn btn-gold" id="claim-btn" type="button">${claimButtonText}</button>
               </div>
             `;
           }
@@ -493,9 +494,10 @@ async function setupDetails() {
       if (isReturned) {
         actionButtonsHtml = '<p class="meta" style="margin-top: 16px; font-weight: 600;">This item has been returned.</p>';
       } else {
+        const claimButtonText = item.type === 'LOST' ? 'I Found It' : "I Think It's Mine";
         actionButtonsHtml = `
           <div style="margin-top: 16px;">
-            <button class="btn btn-gold" id="claim-btn" type="button">I Think This Is Mine</button>
+            <button class="btn btn-gold" id="claim-btn" type="button">${claimButtonText}</button>
           </div>
         `;
       }
