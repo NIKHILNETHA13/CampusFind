@@ -1,6 +1,7 @@
 import os
 import sys
 import uuid
+import re
 from pathlib import Path
 from typing import List, Optional
 from fastapi.responses import Response, FileResponse
@@ -90,13 +91,13 @@ async def get_uploaded_image(filename: str):
 
 class UserRegister(BaseModel):
     name: str
-    email: EmailStr
+    identifier: str
     password: str
     invite_code: Optional[str] = None
 
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    identifier: str
     password: str
 
 
@@ -245,12 +246,32 @@ CLAIM_SELECT = """
 
 # --- Auth Routes ---
 
+def is_valid_identifier(value: str) -> bool:
+    """Return True if value is a valid email OR exactly 10 digits."""
+    if "@" in value:
+        # Simple email validation
+        if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', value):
+            return False
+        return True
+    # Must be exactly 10 digits
+    if len(value) == 10 and value.isdigit():
+        return True
+    return False
+
+
+def is_email(value: str) -> bool:
+    return "@" in value
+
+
 @app.post("/auth/register", status_code=201)
 def register(data: UserRegister):
-    # Check if email exists
-    existing = run_query("SELECT id FROM users WHERE email = %s", (data.email,), fetch="one")
+    if not is_valid_identifier(data.identifier):
+        raise HTTPException(status_code=400, detail="Enter a valid email or exactly 10-digit ID.")
+
+    # Check if identifier already exists
+    existing = run_query("SELECT id FROM users WHERE email = %s", (data.identifier,), fetch="one")
     if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Identifier already registered")
 
     # Determine role: only valid invite code grants admin
     invite_code = os.getenv("ADMIN_INVITE_CODE", "")
@@ -260,15 +281,15 @@ def register(data: UserRegister):
         role = "STUDENT"
 
     sql = "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s) RETURNING id, name, email, role, status, created_at"
-    row = run_query(sql, (data.name, data.email, hash_password(data.password), role), fetch="one")
+    row = run_query(sql, (data.name, data.identifier, hash_password(data.password), role), fetch="one")
     return row
 
 
 @app.post("/auth/login", response_model=TokenResponse)
 def login(data: UserLogin):
-    user = run_query("SELECT * FROM users WHERE email = %s", (data.email,), fetch="one")
+    user = run_query("SELECT * FROM users WHERE email = %s", (data.identifier,), fetch="one")
     if not user or not verify_password(data.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(status_code=401, detail="Invalid identifier or password")
 
     if user.get("status") == "BLOCKED":
         raise HTTPException(status_code=403, detail="Your account has been blocked")

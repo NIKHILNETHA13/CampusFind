@@ -1182,14 +1182,14 @@ function setupAuthForms() {
   if (loginForm) {
     loginForm.addEventListener("submit", async function (event) {
       event.preventDefault();
-      const email = document.getElementById("email").value.trim();
+      const identifier = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       hideError("login-error");
 
       try {
         const data = await apiRequest("/auth/login", {
           method: "POST",
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ identifier, password })
         });
         setToken(data.access_token);
         const role = getUserRoleFromToken(data.access_token);
@@ -1205,12 +1205,12 @@ function setupAuthForms() {
     registerForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
+      const identifier = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const invite_code = document.getElementById("invite_code")?.value.trim() || null;
       hideError("register-error");
 
-      if (!name || !email || !password) {
+      if (!name || !identifier || !password) {
         showError("register-error", "All fields are required.");
         return;
       }
@@ -1218,11 +1218,18 @@ function setupAuthForms() {
         showError("register-error", "Password must be at least 6 characters.");
         return;
       }
+      // Validate identifier format
+      const isEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(identifier);
+      const isTenDigitId = /^\d{10}$/.test(identifier);
+      if (!isEmail && !isTenDigitId) {
+        showError("register-error", "Enter a valid email or exactly 10-digit ID.");
+        return;
+      }
 
       try {
         await apiRequest("/auth/register", {
           method: "POST",
-          body: JSON.stringify({ name, email, password, invite_code })
+          body: JSON.stringify({ name, identifier, password, invite_code })
         });
         alert("Registration successful! Please log in.");
         window.location.href = "login.html";
