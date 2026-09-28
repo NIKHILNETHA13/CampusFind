@@ -43,6 +43,6 @@ Thumbs.db
 downloaded.png
 *.png
 
-# Test files
-test_*.py
-*_test.py
+# Local Docker override (not for production)
+docker-compose.local.yml
+frontend/nginx.local.conf

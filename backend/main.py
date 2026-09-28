@@ -3,7 +3,7 @@ import sys
 import uuid
 from pathlib import Path
 from typing import List, Optional
-from fastapi.responses import Response
+from fastapi.responses import Response, FileResponse
 from azure.storage.blob import BlobServiceClient
 # Ensure backend directory is prioritized in sys.path over any external PYTHONPATH entries
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -58,26 +58,34 @@ blob_container_client = blob_service_client.get_container_client(
 )
 @app.get("/uploads/{filename}")
 async def get_uploaded_image(filename: str):
-    try:
-        blob_client = blob_container_client.get_blob_client(filename)
-        blob_data = blob_client.download_blob().readall()
+    # Try Azure Blob Storage first if configured
+    if AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY:
+        try:
+            blob_client = blob_container_client.get_blob_client(filename)
+            blob_data = blob_client.download_blob().readall()
 
-        properties = blob_client.get_blob_properties()
-        content_type = (
-            properties.content_settings.content_type
-            or "application/octet-stream"
-        )
+            properties = blob_client.get_blob_properties()
+            content_type = (
+                properties.content_settings.content_type
+                or "application/octet-stream"
+            )
 
-        return Response(
-            content=blob_data,
-            media_type=content_type
-        )
+            return Response(
+                content=blob_data,
+                media_type=content_type
+            )
+        except Exception:
+            pass  # Fall through to local filesystem
 
-    except Exception:
-        raise HTTPException(
-            status_code=404,
-            detail="Image not found"
-        )
+    # Fall back to local filesystem
+    file_path = UPLOAD_DIR / filename
+    if file_path.exists():
+        return FileResponse(file_path)
+
+    raise HTTPException(
+        status_code=404,
+        detail="Image not found"
+    )
 # --- Models ---
 
 class UserRegister(BaseModel):

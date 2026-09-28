@@ -248,8 +248,9 @@ function setupMenu() {
 function itemCard(item) {
   const interestCount = Number(item.interest_count || 0);
   const imageHtml = item.image_url
-    ? `<img src="${API_BASE}${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" style="height: 150px; width: 100%; object-fit: cover;">`
-    : `<div class="item-photo">${escapeHtml(item.emoji || "📦")}</div>`;
+    ? `<img src="${API_BASE}${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" style="height: 150px; width: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.querySelector('.item-photo-fallback')?.style.display='flex';">
+       <div class="item-photo-fallback" style="height: 150px; width: 100%; display: none; align-items: center; justify-content: center; background: var(--bg); font-size: 2rem;">${escapeHtml(item.emoji || "📦")}</div>`
+    : `<div class="item-photo" style="height: 150px; display: flex; align-items: center; justify-content: center; background: var(--bg); font-size: 2rem;">${escapeHtml(item.emoji || "📦")}</div>`;
 
   return `
     <article class="item-card">
@@ -387,8 +388,9 @@ async function setupDetails() {
     const interestCount = Number(item.interest_count || 0);
 
     const imageHtml = item.image_url
-      ? `<img src="${API_BASE}${item.image_url}" alt="${item.title}" style="width: 100%; height: 280px; object-fit: cover; border-radius: 10px;">`
-      : `<div class="item-photo" style="height: 280px;">${item.emoji || "📦"}</div>`;
+      ? `<img src="${API_BASE}${item.image_url}" alt="${item.title}" style="width: 100%; height: 280px; object-fit: cover; border-radius: 10px;" onerror="this.style.display='none'; this.parentElement.querySelector('.item-photo-fallback')?.style.display='flex';">
+         <div class="item-photo-fallback" style="height: 280px; display: none; align-items: center; justify-content: center; background: var(--bg); border-radius: 10px; font-size: 3rem;">${item.emoji || "📦"}</div>`
+      : `<div class="item-photo" style="height: 280px; display: flex; align-items: center; justify-content: center; background: var(--bg); border-radius: 10px; font-size: 3rem;">${item.emoji || "📦"}</div>`;
 
     const handoverHtml = (item.handover_method || item.handover_note) ? `
       <div class="handover-info" style="margin-top: 14px; padding: 12px; background: var(--bg); border-radius: 8px;">
@@ -579,6 +581,24 @@ function setupClaim() {
 
   // Load item details
   apiRequest("/items/" + itemId).then(item => {
+    // Update page title, H1, and description based on item type
+    const isLost = item.type === "LOST";
+    const titleEl = document.getElementById("claim-page-title");
+    const descEl = document.getElementById("claim-description");
+    const messageTextarea = document.getElementById("message");
+
+    if (isLost) {
+      document.title = "CampusFind — I Found It";
+      if (titleEl) titleEl.textContent = "I Found It";
+      if (descEl) descEl.textContent = "Tell the person who reported this lost item where/how you found it. All fields are optional.";
+      if (messageTextarea) messageTextarea.placeholder = "I found this item near the library.";
+    } else {
+      document.title = "CampusFind — I Think It's Mine";
+      if (titleEl) titleEl.textContent = "I Think It's Mine";
+      if (descEl) descEl.textContent = "Tell the person who reported this item why you think it may be yours. All fields are optional.";
+      if (messageTextarea) messageTextarea.placeholder = "I think this may be my item. I lost it yesterday.";
+    }
+
     if (summaryDiv) {
       summaryDiv.innerHTML = `
         <div class="panel" style="padding: 16px;">

@@ -2,7 +2,6 @@
 volumes:
   postgres_data:
   uploads_data:
-  frontend_build:
 
 services:
   db:
@@ -15,7 +14,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
-    # Port 5432 NOT exposed to host for security
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-campususer} -d ${DB_NAME:-campusfind}"]
       interval: 5s
@@ -25,6 +23,8 @@ services:
   api:
     build: .
     restart: unless-stopped
+    ports:
+      - "8000:8000"
     environment:
       DATABASE_URL: postgresql://${DB_USER:-campususer}:${DB_PASSWORD:-campuspass}@db:5432/${DB_NAME:-campusfind}
       SECRET_KEY: ${SECRET_KEY:-changeme_in_production}
@@ -32,9 +32,6 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       UPLOAD_DIR: /app/backend/uploads
       ADMIN_INVITE_CODE: ${ADMIN_INVITE_CODE:-campusfind-admin-2024}
-      AZURE_STORAGE_ACCOUNT_NAME: ${AZURE_STORAGE_ACCOUNT_NAME}
-      AZURE_STORAGE_ACCOUNT_KEY: ${AZURE_STORAGE_ACCOUNT_KEY}
-      AZURE_STORAGE_CONTAINER: ${AZURE_STORAGE_CONTAINER}
     volumes:
       - uploads_data:/app/backend/uploads
     depends_on:
@@ -46,12 +43,14 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - "3000:80"
+    depends_on:
+      - api
+
   adminer:
     image: adminer
     restart: unless-stopped
+    ports:
+      - "8080:8080"
     depends_on:
       - db
