@@ -17,7 +17,9 @@ jobs:
           username: ${{ secrets.AZURE_USERNAME }}
           key: ${{ secrets.AZURE_SSH_KEY }}
           script: |
+            set -e
             cd ~/CampusFind
-            git pull origin master
+            git pull --ff-only origin master
+            docker compose config
             docker compose up -d --build
             docker image prune -f
