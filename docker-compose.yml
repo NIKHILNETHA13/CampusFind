@@ -30,6 +30,7 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       UPLOAD_DIR: /app/backend/uploads
       ADMIN_INVITE_CODE: ${ADMIN_INVITE_CODE:?ADMIN_INVITE_CODE must be set}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-https://campusfind.centralindia.cloudapp.azure.com}
     volumes:
       - uploads_data:/app/backend/uploads

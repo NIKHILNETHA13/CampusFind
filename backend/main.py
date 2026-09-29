@@ -26,7 +26,18 @@ except ImportError:
     from tokens import create_access_token, get_current_user, require_admin
 
 
-app = FastAPI(title="CampusFind API", version="0.5.0")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
+# Disable interactive API documentation in production
+IS_PRODUCTION = ENVIRONMENT.lower() == "production"
+
+app = FastAPI(
+    title="CampusFind API",
+    version="0.5.0",
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
+    openapi_url=None if IS_PRODUCTION else "/openapi.json",
+)
 
 # Restrict CORS to production frontend origin
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "https://campusfind.centralindia.cloudapp.azure.com")
@@ -50,18 +61,22 @@ AZURE_STORAGE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
 AZURE_STORAGE_ACCOUNT_KEY = os.getenv("AZURE_STORAGE_ACCOUNT_KEY")
 AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "item-images")
 
-blob_service_client = BlobServiceClient(
-    account_url=f"https://{AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net",
-    credential=AZURE_STORAGE_ACCOUNT_KEY,
-)
-
-blob_container_client = blob_service_client.get_container_client(
-    AZURE_STORAGE_CONTAINER
-)
+# Initialize Azure Blob Storage client only when credentials are configured.
+# This keeps the app importable and runnable in local development without Azure.
+blob_service_client = None
+blob_container_client = None
+if AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY:
+    blob_service_client = BlobServiceClient(
+        account_url=f"https://{AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net",
+        credential=AZURE_STORAGE_ACCOUNT_KEY,
+    )
+    blob_container_client = blob_service_client.get_container_client(
+        AZURE_STORAGE_CONTAINER
+    )
 @app.get("/uploads/{filename}")
 async def get_uploaded_image(filename: str):
     # Try Azure Blob Storage first if configured
-    if AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY:
+    if blob_container_client is not None:
         try:
             blob_client = blob_container_client.get_blob_client(filename)
             blob_data = blob_client.download_blob().readall()
@@ -319,10 +334,22 @@ async def upload_image(file: UploadFile = File(...), current_user: dict = Depend
     if ext not in {".jpg", ".jpeg", ".png", ".gif", ".webp"}:
         ext = ".jpg"
     safe_name = f"{uuid.uuid4().hex}{ext}"
-    file_path = UPLOAD_DIR / safe_name
 
-    with open(file_path, "wb") as f:
-        f.write(content)
+    # Persist to Azure Blob Storage (private container) when configured,
+    # otherwise fall back to the local uploads directory.
+    if blob_container_client is not None:
+        try:
+            blob_client = blob_container_client.get_blob_client(safe_name)
+            blob_client.upload_blob(content, overwrite=True)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to upload image to storage: {e}",
+            )
+    else:
+        file_path = UPLOAD_DIR / safe_name
+        with open(file_path, "wb") as f:
+            f.write(content)
 
     return {"url": f"/uploads/{safe_name}", "filename": safe_name}
 
@@ -338,12 +365,14 @@ def health():
 
 @app.get("/")
 def home():
-    return {
+    response = {
         "project": "CampusFind",
         "phase": "Final Repair",
-        "docs": "/docs",
         "message": "CampusFind API with reliable dashboard synchronization and notifications.",
     }
+    if not IS_PRODUCTION:
+        response["docs"] = "/docs"
+    return response
 
 
 @app.get("/items")
