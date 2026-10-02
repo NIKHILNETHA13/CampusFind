@@ -32,6 +32,9 @@ services:
       ADMIN_INVITE_CODE: ${ADMIN_INVITE_CODE:?ADMIN_INVITE_CODE must be set}
       ENVIRONMENT: ${ENVIRONMENT:-production}
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-https://campusfind.centralindia.cloudapp.azure.com}
+      # Optional Application Insights telemetry. Value is supplied through the
+      # deployment environment; empty disables telemetry.
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ${APPLICATIONINSIGHTS_CONNECTION_STRING:-}
     volumes:
       - uploads_data:/app/backend/uploads
     depends_on:

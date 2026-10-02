@@ -10,3 +10,4 @@ pydantic[email]==2.13.5
 starlette==1.6.0
 anyio==4.15.1
 azure-storage-blob
+azure-monitor-opentelemetry==1.8.10

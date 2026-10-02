@@ -6,3 +6,5 @@ bcrypt
 PyJWT
 passlib[bcrypt]
 pydantic[email]
+azure-storage-blob
+azure-monitor-opentelemetry==1.8.10

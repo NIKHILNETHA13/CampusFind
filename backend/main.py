@@ -4,17 +4,86 @@ import uuid
 import re
 from pathlib import Path
 from typing import List, Optional
-from fastapi.responses import Response, FileResponse
-from azure.storage.blob import BlobServiceClient
+
 # Ensure backend directory is prioritized in sys.path over any external PYTHONPATH entries
 BACKEND_DIR = Path(__file__).resolve().parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
+
+# --- Azure Monitor / Application Insights ---
+# Optional: only enabled when APPLICATIONINSIGHTS_CONNECTION_STRING is present,
+# so local development works without Application Insights.
+#
+# This MUST run before `from fastapi import FastAPI`. configure_azure_monitor()
+# replaces fastapi.FastAPI with an instrumented subclass; binding the name
+# first would keep the plain class and silently collect no request telemetry.
+APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+if APPLICATIONINSIGHTS_CONNECTION_STRING:
+    from azure.monitor.opentelemetry import configure_azure_monitor
+    from opentelemetry.attributes import BoundedAttributes
+    from opentelemetry.sdk.trace import SpanProcessor
+
+    # Attributes holding a full URL, which may carry a trailing query string.
+    _URL_ATTRIBUTES = (
+        "http.url",
+        "http.target",
+        "url.full",
+    )
+    # Attribute holding the bare query string, dropped entirely.
+    _QUERY_ATTRIBUTE = "url.query"
+
+    class _RedactQueryStringProcessor(SpanProcessor):
+        """Strip query strings from spans before they are exported.
+
+        The Python distro records the full request URL including the query
+        string, which can contain user-entered search terms. Microsoft
+        documents applying a span processor as the way to redact query
+        strings for Python, since there is no built-in switch for it.
+
+        A span's attributes are immutable once it ends, so the cleaned set is
+        written back as a new immutable BoundedAttributes instance.
+        """
+
+        def on_start(self, span, parent_context=None):
+            pass
+
+        def on_end(self, span):
+            attributes = span.attributes
+            if not any(
+                "?" in str(attributes.get(k, "")) for k in _URL_ATTRIBUTES
+            ) and _QUERY_ATTRIBUTE not in attributes:
+                return
+
+            cleaned = dict(attributes)
+            for attribute in _URL_ATTRIBUTES:
+                value = cleaned.get(attribute)
+                if isinstance(value, str) and "?" in value:
+                    cleaned[attribute] = value.split("?", 1)[0]
+
+            # A bare query string carries no path to keep, so drop it
+            # entirely rather than exporting an empty placeholder.
+            cleaned.pop(_QUERY_ATTRIBUTE, None)
+
+            span._attributes = BoundedAttributes(attributes=cleaned, immutable=True)
+
+        def shutdown(self):
+            pass
+
+        def force_flush(self, timeout_millis: 30000):
+            return True
+
+    configure_azure_monitor(
+        span_processors=[_RedactQueryStringProcessor()],
+    )
+
+
 from fastapi import FastAPI, HTTPException, Query, Depends, status, UploadFile, File
+from fastapi.responses import Response, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr
+from azure.storage.blob import BlobServiceClient
 
 try:
     from backend.database import run_query, get_db_cursor
